@@ -94,7 +94,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QDir logDir(path);
     if(!logDir.exists()) {
         if(!logDir.mkpath(".")){
-            qErrnoWarning() << "Could not makepath " << logDir.absolutePath();
+            qFatal("%s: %s", "Could not makepath. ", qPrintable(logDir.absolutePath()));
         }
     }
     qDebug() << "Path actually" << path;
