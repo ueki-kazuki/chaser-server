@@ -6,8 +6,7 @@
 ## 開発環境の構築手順
 ```
 $ brew install qt@5
-$
-
+$ brew install qt-creator
 ```
 
 ## 開発時のTips
