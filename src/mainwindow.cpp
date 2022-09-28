@@ -1,9 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QSettings>
+#include <QDir>
 #include <QFileInfo>
 #include <QMediaPlayer>
 #include <QRandomGenerator>
+#include <QStandardPaths>
 #include "Definition.h"
 
 QString getTime(){
@@ -77,7 +79,15 @@ MainWindow::MainWindow(QWidget *parent) :
     if(dark == true)this->anime_map_time -= this->anime_blind_time;
 
     //ログファイルオープン
+    if(path == "")path = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/Logs";
     if(path == "")path = ".";
+    QDir logDir(path);
+    if(!logDir.exists()) {
+        if(!logDir.mkpath(".")){
+            qErrnoWarning() << "Could not makepath " << logDir.absolutePath();
+        }
+    }
+    qDebug() << "Path actually" << path;
     log = StableLog(path + "/log" + getTime() + ".txt");
 
     //スタートアップダイアログ開始
