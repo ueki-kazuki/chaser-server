@@ -9,6 +9,8 @@ QT       += network
 QT       += multimedia
 #QMAKE_CXXFLAGS += -std=c++11
 
+#CONFIG += staticlib
+
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -59,11 +61,13 @@ FORMS    += mainwindow.ui \
     DesignDialog.ui
 
 RESOURCES += \
-    resource.qrc
+    resource.qrc \
+    Info.plist.template
 
 win32:{
     RC_FILE += icon.rc
 }
 mac:{
     ICON += icon.icns
+    QMAKE_INFO_PLIST +=  Info.plist.template
 }
