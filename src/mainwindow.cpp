@@ -53,6 +53,19 @@ MainWindow::MainWindow(QWidget *parent) :
     QString cwd = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     qDebug() << cwd;
 
+    this->initStartupDialog();
+
+    //スタートアップダイアログ開始
+    log << "Startup Exec";
+    qDebug() << "Startup Exec";
+    if(this->startup->exec()){
+        this->initGame();
+    }else{
+        close();
+    }
+}
+
+void MainWindow::initStartupDialog() {
     //ServerSetting読み込み
     qDebug() << "ServerSetting";
     QString path;
@@ -99,35 +112,31 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     qDebug() << "Path actually" << path;
     log = StableLog(path + "/log" + getTime() + ".txt");
+}
 
-    //スタートアップダイアログ開始
-    log << "Startup Exec";
-    qDebug() << "Startup Exec";
-    if(this->startup->exec()){
-        //マップ初期化
-        for(int i=0;i<TEAM_COUNT;i++){
-            this->ui->Field->team_pos[i] = this->startup->map.team_first_point[i];
-            qDebug() << this->ui->Field->team_pos[i];
-        }
-        //ui初期化
-        this->ui->Field  ->setMap(this->startup->map);
-        this->ui->TimeBar->setMaximum(this->startup->map.turn);
-        this->ui->TimeBar->setValue  (this->startup->map.turn);
-        this->ui->TurnLabel     ->setText("残りターン : " + QString::number(this->ui->TimeBar->value()));
-        this->ui->CoolNameLabel ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::COOL)]->client->Name == "" ? "Cool" : this->startup->team_client[static_cast<int>(GameSystem::TEAM::COOL)]->client->Name);
-        this->ui->HotNameLabel  ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name == "" ? "Hot"  : this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name);
+void MainWindow::initGame() {
+    QSettings* mSettings;
 
-        //ボット戦モードならば表記の変更
-        if(this->isbotbattle){
-            this->ui->HotScoreLabel ->setText(QString::number(this->startup->map.turn) + "(ITEM:0)");
-            this->ui->CoolScoreLabel->setText(QString::number(this->startup->map.turn) + "(ITEM:0)");
-        }else{
-            this->ui->HotScoreLabel ->setText("0");
-            this->ui->CoolScoreLabel->setText("0");
-        }
+    //マップ初期化
+    for(int i=0;i<TEAM_COUNT;i++){
+        this->ui->Field->team_pos[i] = this->startup->map.team_first_point[i];
+        qDebug() << this->ui->Field->team_pos[i];
+    }
+    //ui初期化
+    this->ui->Field  ->setMap(this->startup->map);
+    this->ui->TimeBar->setMaximum(this->startup->map.turn);
+    this->ui->TimeBar->setValue  (this->startup->map.turn);
+    this->ui->TurnLabel     ->setText("残りターン : " + QString::number(this->ui->TimeBar->value()));
+    this->ui->CoolNameLabel ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::COOL)]->client->Name == "" ? "Cool" : this->startup->team_client[static_cast<int>(GameSystem::TEAM::COOL)]->client->Name);
+    this->ui->HotNameLabel  ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name == "" ? "Hot"  : this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name);
 
+    //ボット戦モードならば表記の変更
+    if(this->isbotbattle){
+        this->ui->HotScoreLabel ->setText(QString::number(this->startup->map.turn) + "(ITEM:0)");
+        this->ui->CoolScoreLabel->setText(QString::number(this->startup->map.turn) + "(ITEM:0)");
     }else{
-        exit(0);
+        this->ui->HotScoreLabel ->setText("0");
+        this->ui->CoolScoreLabel->setText("0");
     }
 
     player = 0;
@@ -143,19 +152,18 @@ MainWindow::MainWindow(QWidget *parent) :
     */
 
     //消音モードじゃない かつ Musicフォルダに音楽が存在する ならBGMセット
-    if(!silent && this->startup->music_text != "none"){
+    if(!silent && this->startup->music_text != "None"){
         bgm = new QMediaPlayer;
         connect(bgm, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
         bgm->setMedia(QUrl::fromLocalFile("./Music/" + this->startup->music_text));
         bgm->setVolume(50);
         bgm->play();
+
+        //log << "[ Music : " + MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav ]" + "\r\n";
+        log << "[ Music : " + QUrl::fromLocalFile("./Music/" + this->startup->music_text).toLocalFile() + " ]" + "\r\n";
+        //log << MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav";
     }
 
-    //log << "[ Music : " + MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav ]" + "\r\n";
-    log << "[ Music : " + this->startup->music_text + " ]" + "\r\n";
-
-
-    //log << MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav";
 
     for(int i=0;i<TEAM_COUNT;i++){
         ui->Field->team_pos[i].setX(-1);
@@ -170,6 +178,9 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     ui->ItemLeaveLabel->setText(QString::number(this->ui->Field->leave_items));
 
+    mSettings = new QSettings( "setting.ini", QSettings::IniFormat ); // iniファイルで設定を保存
+    mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
+    QVariant v;
     v = mSettings->value( "Maximum" );
     if (v.type() != QVariant::Invalid && v.toBool()){
         setWindowState(Qt::WindowMaximized);

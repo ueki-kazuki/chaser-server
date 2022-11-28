@@ -61,6 +61,8 @@ private slots:
     void SaveFile();
 
     //ゲーム進行
+    void initStartupDialog();
+    void initGame();
     void StepGame();
     //アイテム取得の判定
     void RefreshItem(GameSystem::Method method);
