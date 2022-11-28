@@ -74,6 +74,7 @@ private slots:
     void StartAnimation();
     void ShowTeamAnimation();
     void BlindAnimation();
+    void on_pushButtonClose_released();
 };
 
 #endif // MAINWINDOW_H

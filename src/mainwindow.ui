@@ -440,6 +440,16 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QPushButton" name="pushButtonClose">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>閉じる</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>

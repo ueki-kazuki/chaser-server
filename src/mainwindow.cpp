@@ -421,6 +421,7 @@ void MainWindow::Finish(GameSystem::WINNER winner){
     }
     */
     //log.close();
+    this->ui->pushButtonClose->setEnabled(true);
 }
 GameSystem::WINNER MainWindow::Judge(){
     bool team_lose[TEAM_COUNT];
@@ -621,4 +622,19 @@ void MainWindow::BlindAnimation(){
     }
     timer += 2;
     repaint();
+}
+
+void MainWindow::on_pushButtonClose_released()
+{
+    hide();
+    GameSystem::Map old_map = this->startup->map;
+    this->startup = new StartupDialog();
+    this->initStartupDialog();
+    this->startup->map = old_map;
+
+    if(this->startup->exec()){
+        this->initGame();
+    }else{
+        close();
+    }
 }
