@@ -8,6 +8,8 @@
 #include <QStandardPaths>
 #include "Definition.h"
 
+int const MainWindow::EXIT_CODE_REBOOT = -123456789;
+
 QString getTime(){
     return QString("[") + QDateTime::currentDateTime().toString("yyyyMMddhhmmss") + QString("]");
 }
@@ -50,18 +52,11 @@ MainWindow::MainWindow(QWidget *parent) :
     qDebug() << "Connect";
     connect(this,SIGNAL(destroyed()),this,SLOT(SaveFile()));
 
-    QString cwd = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-    qDebug() << cwd;
-
     this->initStartupDialog();
 
     //スタートアップダイアログ開始
-    log << "Startup Exec";
-    qDebug() << "Startup Exec";
-    if(this->startup->exec()){
+    if(this->startup->exec()) {
         this->initGame();
-    }else{
-        close();
     }
 }
 
@@ -421,6 +416,7 @@ void MainWindow::Finish(GameSystem::WINNER winner){
     }
     */
     //log.close();
+    disconnect(clock,SIGNAL(timeout()),this,SLOT(StepGame()));
     this->ui->pushButtonClose->setEnabled(true);
 }
 GameSystem::WINNER MainWindow::Judge(){
@@ -568,7 +564,7 @@ void MainWindow::StartAnimation(){
 
 
 void MainWindow::ShowTeamAnimation(){
-    static int team_count;
+    static int team_count = 0;
 
     ui->Field->team_pos[team_count] = this->startup->map.team_first_point[team_count];
 
@@ -626,15 +622,7 @@ void MainWindow::BlindAnimation(){
 
 void MainWindow::on_pushButtonClose_released()
 {
-    hide();
-    GameSystem::Map old_map = this->startup->map;
-    this->startup = new StartupDialog();
-    this->initStartupDialog();
-    this->startup->map = old_map;
-
-    if(this->startup->exec()){
-        this->initGame();
-    }else{
-        close();
-    }
+    qDebug() << "Performing application reboot...";
+    qApp->exit( MainWindow::EXIT_CODE_REBOOT );
 }
+
