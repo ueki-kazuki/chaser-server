@@ -54,6 +54,12 @@ public slots:
     //設定
     void Setting();
 
+private slots:
+    void on_ServerStartButton_released();
+
+signals:
+    void startupClosedSignal();
+
 };
 
 #endif // STARTUPDIALOG_H

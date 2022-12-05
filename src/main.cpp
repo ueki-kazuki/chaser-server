@@ -18,13 +18,8 @@ int main(int argc, char *argv[])
         qDebug() << "Could not change the current working directory";
     qDebug() << QDir::currentPath();
 
-    int currentExitCode = 0;
-    do {
-        QApplication a(argc, argv);
-        MainWindow w;
-        w.show();
-        currentExitCode = a.exec();
-    } while( currentExitCode == MainWindow::EXIT_CODE_REBOOT );
-
-    return currentExitCode;
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
 }

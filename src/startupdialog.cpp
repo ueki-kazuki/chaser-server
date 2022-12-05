@@ -13,11 +13,11 @@ StartupDialog::StartupDialog(QWidget *parent) :
     map_standby(false)
 {
     //UI初期化
-    qDebug() << "SetupUI";
+    qDebug() << Q_FUNC_INFO << "SetupUI";
     ui->setupUi(this);
-    qDebug() << "SetMusicFileList";
+    qDebug() << Q_FUNC_INFO << "SetMusicFileList";
     setMusicFileList();
-    qDebug() << "SetImageThemaList";
+    qDebug() << Q_FUNC_INFO << "SetImageThemaList";
     setImageThemaList();
     music_text = ui->GameMusicCombo->currentText();
     ui->CoolGroupBox->SetPortSpin(2009);
@@ -30,12 +30,12 @@ StartupDialog::StartupDialog(QWidget *parent) :
         team_standby[i] = false;
     }
 
-    qDebug() << "Connect GroupBox";
+    qDebug() << Q_FUNC_INFO << "Connect GroupBox";
     connect(ui->CoolGroupBox,SIGNAL(Standby(ClientSettingForm*,bool)),this,SLOT(ClientStandby(ClientSettingForm*,bool)));
     connect(ui->HotGroupBox ,SIGNAL(Standby(ClientSettingForm*,bool)),this,SLOT(ClientStandby(ClientSettingForm*,bool)));
 
     //ローカルIPの探索
-    qDebug() << "Networking";
+    qDebug() << Q_FUNC_INFO << "Networking";
     foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
         if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
             this->ui->LocalIPLabel->setText(address.toString());
@@ -167,3 +167,10 @@ void StartupDialog::ShowDesignDialog(){
     }
     delete diag;
 }
+
+void StartupDialog::on_ServerStartButton_released()
+{
+    Q_EMIT(startupClosedSignal());
+    this->accept();
+}
+

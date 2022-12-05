@@ -20,7 +20,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
+    BlindAnimation.cpp \
+    GameAnimation.cpp \
+    TeamAnimation.cpp \
+    Animation.cpp \
+    mainwindow.cpp \
     startupdialog.cpp \
     GameSystem.cpp \
     TcpClient.cpp \
@@ -36,6 +40,10 @@ SOURCES += main.cpp\
     DesignDialog.cpp
 
 HEADERS  += mainwindow.h \
+    BlindAnimation.h \
+    GameAnimation.h \
+    TeamAnimation.h \
+    Animation.h \
     startupdialog.h \
     GameSystem.h \
     TcpClient.h \
