@@ -69,31 +69,40 @@ bool GameSystem::Map::Import(QString Filename){
             str.replace("\r","");
             str.replace("\n","");
 
-            //マップ名
-            if(str[0]=='N')name = str.remove(0,2);
-            //ターン数
-            if(str[0]=='T')turn = str.remove(0,2).toInt();
+            QStringList list;
+            QVector<GameSystem::MAP_OBJECT> vec;
 
-
-            //マップ
-            if(str[0]=='D'){
-                QStringList list = str.remove(0,2).split(",");
-                QVector<GameSystem::MAP_OBJECT> vec;
+            qint32 c = str[0].unicode() & 0xff;
+            switch(c) {
+            case 'N':
+                //マップ名
+                name = str.remove(0,2);
+                break;
+            case 'T':
+                //ターン数
+                turn = str.remove(0,2).toInt();
+                break;
+            case 'D':
+                //マップ
+                list = str.remove(0,2).split(",");
                 foreach(QString s,list){
                     vec.push_back(static_cast<GameSystem::MAP_OBJECT>(s.toInt()));
                 }
                 size.setX(vec.size());
                 field[calm] = vec;
                 calm++;
-            }
-
-            //チーム初期位置
-            for(int i=0;i<TEAM_COUNT;i++){
-                if(str[0]==GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i))[0]){
-                    QStringList list = str.remove(0,2).split(",");
-                    team_first_point[i] = QPoint(list[0].toInt(),list[1].toInt());
+                break;
+            default:
+                //チーム初期位置
+                for(int i=0;i<TEAM_COUNT;i++){
+                    if(str[0]==GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i))[0]){
+                        QStringList list = str.remove(0,2).split(",");
+                        team_first_point[i] = QPoint(list[0].toInt(),list[1].toInt());
+                    }
                 }
             }
+
+
         }
         return true;
     }else{
