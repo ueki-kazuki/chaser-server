@@ -1,9 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QSettings>
+#include <QDir>
 #include <QFileInfo>
 #include <QMediaPlayer>
 #include <QRandomGenerator>
+#include <QStandardPaths>
 #include "Definition.h"
 
 QString getTime(){
@@ -40,16 +42,24 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    qDebug() << "Startup";
     ui->setupUi(this);
     this->startup = new StartupDialog();
     this->win = GameSystem::WINNER::CONTINUE;
 
+    qDebug() << "Connect";
     connect(this,SIGNAL(destroyed()),this,SLOT(SaveFile()));
 
+    QString cwd = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    qDebug() << cwd;
+
     //ServerSetting読み込み
+    qDebug() << "ServerSetting";
     QString path;
     QSettings* mSettings;
     QVariant v;
+    QFileInfo fi("setting.ini");
+    qDebug() << "SettingIni Open " << fi.absoluteFilePath();
     mSettings = new QSettings( "setting.ini", QSettings::IniFormat ); // iniファイルで設定を保存
     mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
     v = mSettings->value( "LogFilepath" );
@@ -77,10 +87,22 @@ MainWindow::MainWindow(QWidget *parent) :
     if(dark == true)this->anime_map_time -= this->anime_blind_time;
 
     //ログファイルオープン
+    qDebug() << "Path LogFilepath" << path;
+    if(path == "")path = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/Logs";
+    qDebug() << "Path AppLocalDataLocation" << path;
     if(path == "")path = ".";
+    QDir logDir(path);
+    if(!logDir.exists()) {
+        if(!logDir.mkpath(".")){
+            qFatal("%s: %s", "Could not makepath. ", qPrintable(logDir.absolutePath()));
+        }
+    }
+    qDebug() << "Path actually" << path;
     log = StableLog(path + "/log" + getTime() + ".txt");
 
     //スタートアップダイアログ開始
+    log << "Startup Exec";
+    qDebug() << "Startup Exec";
     if(this->startup->exec()){
         //マップ初期化
         for(int i=0;i<TEAM_COUNT;i++){
@@ -139,7 +161,7 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->Field->team_pos[i].setX(-1);
         ui->Field->team_pos[i].setY(-1);
     }
-    
+
     //アイテム数ラベルセット
     for(int i=0;i<startup->map.size.y();i++){
        for(int j=0;j<startup->map.size.x();j++){

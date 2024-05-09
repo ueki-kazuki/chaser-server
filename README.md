@@ -27,7 +27,6 @@
 * **通信タイムアウト時間** TCPクライアントにおけるレスポンスの待ち時間です。長ければ長いほどクライアントがタイムアウトしにくくなります。
 
 ## 開発環境
-- MacOSX 10.11.3 ElCapitan  
-- Qt Creator 3.3.0  
-- Desktop Qt 5.4.2 clang 64bit  
-
+* MacOSX 10.11.3 ElCapitan
+* Qt Creator 3.3.0
+* Desktop Qt 5.4.2 clang 64bit
